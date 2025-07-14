@@ -22,7 +22,7 @@ const Layout = () =>{
     })
 
     return (
-        <div className="fixed inset-0 overflow-hidden overflow-x-hidden bg-[#fff9f9] transition-colors dark:bg-slate-950">
+        <div className="fixed inset-0 overflow-hidden overflow-x-hidden bg-[#fff9f9] transition-colors">
         <div className={cn("pointer-events-none fixed inset-0 -z-10 bg-black opacity-0 transition-opacity",
          !collapsed && "max-md:pointer-events-auto max-md:opacity-30 max-md:z-50",
         )}  

@@ -9,7 +9,7 @@
 @layer base {
     body{
         
-        @apply bg-white [scrollbar-color:_#cbd5e1_transparent] dark:[scrollbar-color:_#334155_transparent] font-poppins;
+        @apply bg-white [scrollbar-color:_#cbd5e1_transparent] font-poppins;
     }
  
 
