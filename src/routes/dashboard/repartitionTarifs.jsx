@@ -124,7 +124,8 @@ const GestionTarifs= () => {
                     />
                   ))}
                 </Pie>
-                <Legend verticalAlign="bottom" height={36} />
+                <Legend layout="horizontal" verticalAlign="bottom" wrapperStyle={{ whiteSpace: 'normal', lineHeight: '20px' }} />
+
               </PieChart>
             </ResponsiveContainer>
           </div>
