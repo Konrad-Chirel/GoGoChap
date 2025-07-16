@@ -1,22 +1,15 @@
-import React, { useState } from "react";
-import ListeLitiges from "@/routes/dashboard/listeLitiges"; 
-import Discussion from "@/routes/dashboard/discussionLitige"; 
+import React from "react";
+import { Outlet } from "react-router-dom";
+import ListeLitiges from "@/routes/dashboard/listeLitiges";
 
-
-
-
-
-export default function  GestionLitiges (){
-    const [ litigeActif,setLitigeActif]=useState (null);
-    return(
-        <div className=" h-screen">
-            {
-                !litigeActif?(
-                    <ListeLitiges onSelectLitige={(litiges)=>setLitigeActif (litiges)}/>)
-                    :(
-                        <Discussion litiges={litigeActif}onClose={()=>setLitigeActif(null)}/>
-                    )
-            }
-            </div>
-    );
+export default function GestionLitiges() {
+  return (
+    <div className="h-full">
+      {/* ✅ CORRIGÉ : Utilise Outlet pour afficher les routes enfants (DiscussionLitige) */}
+      <Outlet />
+      {/* Si aucune route enfant n'est active, affiche la liste des litiges */}
+      <ListeLitiges />
+    </div>
+  );
 }
+

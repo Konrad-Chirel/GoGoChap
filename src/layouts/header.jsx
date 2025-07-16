@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { useUser } from "@/contexts/user-context";
 
-
 import {
   Bell,
   ChevronsLeft,
@@ -14,7 +13,7 @@ import {
 
 import PropTypes from "prop-types";
 import { useFilter } from "@/contexts/filter-context";
-import { toast } from "react-hot-toast"; // ✅ en haut du fichier
+import { toast } from "react-hot-toast";
 
 export const Header = ({ collapsed, setCollapsed }) => {
    const { user } = useUser();
@@ -37,7 +36,7 @@ const isHomePage = location.pathname === "/";
       id: 2,
       type: "client",
       title: "Nouveau client",
-      description: "Un client s’est inscrit à votre plateforme.",
+      description: "Un client s'est inscrit à votre plateforme.",
       time: "Il y a 30 min",
       timestamp: Date.now() - 30 * 60 * 1000,
     },
@@ -54,7 +53,7 @@ const isHomePage = location.pathname === "/";
 
   const notificationRef = useRef(null);
   const bellRef = useRef(null);
-const prevNotifCount = useRef(notificationList.length); // ✅ en haut du composant
+const prevNotifCount = useRef(notificationList.length);
 
 useEffect(() => {
   if (notificationList.length > prevNotifCount.current) {
@@ -71,7 +70,6 @@ useEffect(() => {
   }
   prevNotifCount.current = notificationList.length;
 }, [notificationList]);
-
 
   // Supprimer notifications après 24h
   useEffect(() => {
@@ -120,7 +118,8 @@ useEffect(() => {
   };
 
   return (
-    <header className="relative z-10 flex h-[80px] items-center justify-between bg-[#ffc107] px-4 md:px-6 shadow-md">
+    // ✅ CORRIGÉ : Z-index augmenté de z-10 à z-50 pour éviter les conflits avec sidebar (z-100)
+    <header className="relative z-50 flex h-[80px] items-center justify-between bg-[#ffc107] px-4 md:px-6 shadow-md">
       {/* Gauche */}
       <div className="flex items-center gap-x-2 md:gap-x-4">
         <button
@@ -170,9 +169,9 @@ useEffect(() => {
           )}
         </button>
 
-        {/* Liste des notifications */}
+        {/* ✅ CORRIGÉ : Z-index très élevé pour les notifications (au-dessus de tout) */}
         {showNotifications && (
-          <div className="absolute top-14 right-0 w-[300px] bg-white shadow-lg rounded-lg overflow-hidden z-50 border border-gray-200">
+          <div className="absolute top-14 right-0 w-[300px] bg-white shadow-lg rounded-lg overflow-hidden z-[200] border border-gray-200">
             <div className="p-4 border-b bg-[#1238D8] text-white rounded-t-lg font-semibold text-sm">
               Notifications
             </div>
@@ -227,10 +226,8 @@ useEffect(() => {
   )}
 </div>
 
-
           <div className="flex flex-col items-start pr-12 hidden sm:flex">
-            <span className="font-poppins font-semibold text-[16px] leading-[100%] tracking-[0] text-[#1238D8]
-">
+            <span className="font-poppins font-semibold text-[16px] leading-[100%] tracking-[0] text-[#1238D8]">
    {user.name}
 </span>
 
@@ -250,3 +247,5 @@ Header.propTypes = {
   collapsed: PropTypes.bool,
   setCollapsed: PropTypes.func,
 };
+
+

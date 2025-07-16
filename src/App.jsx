@@ -14,7 +14,7 @@ import { FilterProvider } from "./contexts/filter-context";
 import { Toaster } from "react-hot-toast";
 import RepartitionTarifs from "./routes/dashboard/repartitionTarifs.jsx";
 import Login from "./routes/login";
-import ProtectedRoute from "./components/ProtectedRoute"; // <-- AJOUTÉ
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   const router = createBrowserRouter([
@@ -58,8 +58,9 @@ function App() {
           path: "zone_geographique_desservies",
           element: <ZonesGeographiques />,
         },
+        // ✅ CORRIGÉ : La route pour DiscussionLitige doit être imbriquée sous gestion_des_litiges
         {
-          path: "discussion/:id",
+          path: "gestion_des_litiges/:id",
           element: <DiscussionLitige />,
         },
         {
@@ -81,3 +82,5 @@ function App() {
 }
 
 export default App;
+
+

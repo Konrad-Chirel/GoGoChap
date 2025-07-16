@@ -14,7 +14,7 @@ const litiges = [
     id: "4576",
     titre: "Commande non livrée",
     date: "2025-06-21T08:00:00Z",
-    description: "La cliente n’a jamais reçu sa commande mais le livreur indique l’avoir déposée.",
+    description: "La cliente n'a jamais reçu sa commande mais le livreur indique l'avoir déposée.",
     auteur: "Arlène McClay",
     priorité: "Urgent",
     statut: "ouvert"
@@ -32,13 +32,13 @@ const litiges = [
     id: "4565",
     titre: "Problème application",
     date: "2025-06-19T10:00:00Z",
-    description: "L’application se fige lors de la sélection d’un moyen de paiement.",
+    description: "L'application se fige lors de la sélection d'un moyen de paiement.",
     auteur: "Alexis Antoine",
     priorité: "Faible",
     statut: "resolu"
   },
   {
-    id: "#4562",
+    id: "4562", // ✅ CORRIGÉ : Supprimé le # pour éviter les problèmes d'URL
     titre: "Livreur inapproprié",
     date: "2025-06-18T15:00:00Z",
     description: "Comportement inapproprié signalé par un client envers un livreur.",
@@ -67,7 +67,7 @@ function getElapsedTime(dateString) {
   if (diffH > 0) return `Ouvert depuis ${diffH} heure${diffH > 1 ? "s" : ""}`;
   const diffM = Math.floor(diffMs / (1000 * 60));
   if (diffM > 0) return `Ouvert depuis ${diffM} minute${diffM > 1 ? "s" : ""}`;
-  return "Ouvert à l’instant";
+  return "Ouvert à l'instant";
 }
 
 // Fonction pour obtenir la couleur du badge selon la priorité
@@ -127,8 +127,6 @@ const ListeLitiges = () => {
   ))}
 </div>
 
-
-
       {/* Liste des litiges */}
      {/* Conteneur scrollable horizontal */}
 <div className="overflow-x-auto">
@@ -140,7 +138,8 @@ const ListeLitiges = () => {
         <li
           key={litige.id}
           className="flex items-center gap-4 py-4 px-2 hover:bg-gray-50 transition cursor-pointer"
-          onClick={() => navigate(`/discussion/${litige.id}`, { state: { litige } })}
+          // ✅ CORRIGÉ : Navigation vers la route imbriquée correcte
+          onClick={() => navigate(`/gestion_des_litiges/${litige.id}`, { state: { litige } })}
         >
           <img
             src={avatars[litige.auteur] || "https://ui-avatars.com/api/?name=" + encodeURIComponent(litige.auteur)}
@@ -151,7 +150,7 @@ const ListeLitiges = () => {
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
               <span className="font-semibold text-base truncate">{litige.titre}</span>
-              <span className="text-gray-400 text-xs ml-2">{litige.id}</span>
+              <span className="text-gray-400 text-xs ml-2">#{litige.id}</span>
             </div>
             <div className="text-xs text-gray-500 mt-0.5">{getElapsedTime(litige.date)}</div>
             <div className="text-sm text-gray-700 mt-1">{litige.description}</div>
@@ -175,4 +174,5 @@ const ListeLitiges = () => {
     </div>
   );
 }; 
-export default ListeLitiges;// Clic sur tout le
+export default ListeLitiges;
+
