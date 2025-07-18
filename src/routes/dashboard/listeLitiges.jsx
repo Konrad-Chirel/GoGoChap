@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { BadgeCheck, Trash2 } from "lucide-react";
+import { BadgeCheck } from "lucide-react";
 
-// Exemple d'avatars (tu peux remplacer les URLs par les vraies images de ton projet)
+// Exemple d'avatars
 const avatars = {
   "Arlène McClay": "https://randomuser.me/api/portraits/women/44.jpg",
   "Leslie Alexander": "https://randomuser.me/api/portraits/women/65.jpg",
@@ -38,7 +38,7 @@ const litiges = [
     statut: "resolu"
   },
   {
-    id: "4562", // ✅ CORRIGÉ : Supprimé le # pour éviter les problèmes d'URL
+    id: "4562",
     titre: "Livreur inapproprié",
     date: "2025-06-18T15:00:00Z",
     description: "Comportement inapproprié signalé par un client envers un livreur.",
@@ -55,7 +55,7 @@ const filtres = [
   { label: "Résolus", value: "resolu" }
 ];
 
-// Fonction utilitaire pour calculer le temps écoulé depuis la date du litige
+// Fonction utilitaire pour calculer le temps écoulé
 function getElapsedTime(dateString) {
   const now = new Date();
   const date = new Date(dateString);
@@ -70,7 +70,7 @@ function getElapsedTime(dateString) {
   return "Ouvert à l'instant";
 }
 
-// Fonction pour obtenir la couleur du badge selon la priorité
+// Couleur du badge selon la priorité
 function getBadgeColor(priorité) {
   switch (priorité.toLowerCase()) {
     case "urgent":
@@ -84,11 +84,15 @@ function getBadgeColor(priorité) {
   }
 }
 
+// Vérifie si le litige est traité
+function isTraite(id) {
+  return localStorage.getItem(`litige_${id}_traite`) === "true";
+}
+
 const ListeLitiges = () => {
   const [filtre, setFiltre] = useState("tous");
   const navigate = useNavigate();
 
-  // Filtrage selon le filtre sélectionné
   const litigesFiltres = litiges.filter(litige => {
     if (filtre === "tous") return true;
     if (filtre === "ouvert") return litige.statut === "ouvert";
@@ -97,7 +101,6 @@ const ListeLitiges = () => {
     return true;
   });
 
-  // Compteurs pour les boutons
   const countTous = litiges.length;
   const countOuverts = litiges.filter(l => l.statut === "ouvert").length;
   const countUrgents = litiges.filter(l => l.priorité.toLowerCase() === "urgent").length;
@@ -113,66 +116,71 @@ const ListeLitiges = () => {
   return (
     <div className="bg-white p-6 w-full min-h-screen">
       <h1 className="text-2xl font-bold mb-6">Gestion des litiges / support client</h1>
-
-   <div className="flex flex-wrap gap-2 mb-6">
-  {filtres.map(({ label, value }) => (
-    <button
-      key={value}
-      onClick={() => setFiltre(value)}
-      className={`px-2 py-0.5 rounded-full text-[12px] sm:text-xs font-medium transition whitespace-nowrap
-        ${filtre === value ? "bg-[#1238D8] text-white" : "bg-gray-100 text-[#1238D8]"}`}
-    >
-      {label} ({compteurParFiltre[value]})
-    </button>
-  ))}
-</div>
-
-      {/* Liste des litiges */}
-     {/* Conteneur scrollable horizontal */}
-<div className="overflow-x-auto">
-  <ul className="divide-y divide-gray-200 min-w-[600px] sm:min-w-full">
-    {litigesFiltres.length === 0 ? (
-      <li className="py-4 px-2 text-gray-500">Aucun litige trouvé.</li>
-    ) : (
-      litigesFiltres.map((litige) => (
-        <li
-          key={litige.id}
-          className="flex items-center gap-4 py-4 px-2 hover:bg-gray-50 transition cursor-pointer"
-          // ✅ CORRIGÉ : Navigation vers la route imbriquée correcte
-          onClick={() => navigate(`/gestion_des_litiges/${litige.id}`, { state: { litige } })}
-        >
-          <img
-            src={avatars[litige.auteur] || "https://ui-avatars.com/api/?name=" + encodeURIComponent(litige.auteur)}
-            alt={litige.auteur}
-            className="w-10 h-10 rounded-full object-cover border border-gray-200 hover:scale-105 transition"
-          />
-          {/* Infos principales */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
-              <span className="font-semibold text-base truncate">{litige.titre}</span>
-              <span className="text-gray-400 text-xs ml-2">#{litige.id}</span>
-            </div>
-            <div className="text-xs text-gray-500 mt-0.5">{getElapsedTime(litige.date)}</div>
-            <div className="text-sm text-gray-700 mt-1">{litige.description}</div>
-            <div className="text-xs text-gray-400 mt-1 italic">{litige.auteur}</div>
-          </div>
-          {/* Statut + Action */}
-          <div className="flex flex-col items-end gap-2 min-w-[90px]">
-            <span
-              className={`border px-2 py-0.5 rounded-full text-xs font-bold ${getBadgeColor(litige.priorité)}`}
-            >
-              {litige.priorité}
-            </span>
-            <button className="text-blue-600 text-xs font-medium hover:underline">Traiter</button>
-          </div>
-        </li>
-      ))
-    )}
-  </ul>
-</div>
-
+      <div className="flex flex-wrap gap-2 mb-6">
+        {filtres.map(({ label, value }) => (
+          <button
+            key={value}
+            onClick={() => setFiltre(value)}
+            className={`px-2 py-0.5 rounded-full text-[12px] sm:text-xs font-medium transition whitespace-nowrap
+              ${filtre === value ? "bg-[#1238D8] text-white" : "bg-gray-100 text-[#1238D8]"}`}
+          >
+            {label} ({compteurParFiltre[value]})
+          </button>
+        ))}
+      </div>
+      <div className="overflow-x-auto">
+        <ul className="divide-y divide-gray-200 min-w-[600px] sm:min-w-full">
+          {litigesFiltres.length === 0 ? (
+            <li className="py-4 px-2 text-gray-500">Aucun litige trouvé.</li>
+          ) : (
+            litigesFiltres.map((litige) => (
+              <li
+                key={litige.id}
+                className="flex items-center gap-4 py-4 px-2 hover:bg-gray-50 transition cursor-pointer"
+                onClick={() =>
+                  navigate(`/gestion_des_litiges/${litige.id}`, {
+                    state: {
+                      litige: {
+                        ...litige,
+                        avatar: avatars[litige.auteur] || null,
+                      },
+                    },
+                  })
+                }
+              >
+                <img
+                  src={avatars[litige.auteur] || "https://ui-avatars.com/api/?name=" + encodeURIComponent(litige.auteur)}
+                  alt={litige.auteur}
+                  className="w-10 h-10 rounded-full object-cover border border-gray-200 hover:scale-105 transition"
+                />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold text-base truncate">{litige.titre}</span>
+                    <span className="text-gray-400 text-xs ml-2">#{litige.id}</span>
+                  </div>
+                  <div className="text-xs text-gray-500 mt-0.5">{getElapsedTime(litige.date)}</div>
+                  <div className="text-sm text-gray-700 mt-1">{litige.description}</div>
+                  <div className="text-xs text-gray-400 mt-1 italic">{litige.auteur}</div>
+                </div>
+                <div className="flex flex-col items-end gap-2 min-w-[90px]">
+                  <span
+                    className={`border px-2 py-0.5 rounded-full text-xs font-bold ${getBadgeColor(litige.priorité)}`}
+                  >
+                    {litige.priorité}
+                  </span>
+                  {isTraite(litige.id) && (
+                    <span className="border px-2 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-700 border-green-400 flex items-center gap-1 mt-1">
+                      <BadgeCheck size={14} /> Traité
+                    </span>
+                  )}
+                
+                </div>
+              </li>
+            ))
+          )}
+        </ul>
+      </div>
     </div>
   );
-}; 
+};
 export default ListeLitiges;
-

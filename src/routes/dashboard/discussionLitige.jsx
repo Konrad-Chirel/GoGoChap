@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useLocation } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
-export default function DiscussionLitige({onClose}) {
+export default function DiscussionLitige() {
   const location = useLocation();
   const navigate = useNavigate();
-  
-  const litiges = location.state?.litige;
+  const litige = location.state?.litige;
+
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [litigeTraite, setLitigeTraite] = useState(false);
@@ -14,39 +13,44 @@ export default function DiscussionLitige({onClose}) {
   const [editedContent, setEditedContent] = useState("");
   const messageEndRef = useRef(null);
 
-  const storageKey = `messages_litige_${litiges?.id || "default"}`;
+  const storageKey = `messages_litige_${litige?.id || "default"}`;
+  const traiteKey = `litige_${litige?.id}_traite`;
 
- useEffect(() => {
-  const saved = localStorage.getItem(storageKey);
-  if (saved) {
-    const parsed = JSON.parse(saved);
-    if (parsed.length > 0) {
-      setMessages(parsed);
+  useEffect(() => {
+    setLitigeTraite(localStorage.getItem(traiteKey) === "true");
+  }, [traiteKey]);
+
+  useEffect(() => {
+    const saved = localStorage.getItem(storageKey);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (parsed.length > 0) {
+        setMessages(parsed);
+      } else {
+        setMessages([
+          {
+            id: 1,
+            sender: "client",
+            name: litige?.auteur || "Client",
+            avatar: litige?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(litige?.auteur || "Client")}`,
+            content: litige?.description || "Bonjour, j'ai un souci avec ma commande.",
+            time: new Date().toISOString(),
+          },
+        ]);
+      }
     } else {
       setMessages([
         {
           id: 1,
           sender: "client",
-          name: litiges?.auteur || "Client", // ✅ CORRIGÉ : Utilise litiges.auteur
-          avatar: litiges?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(litiges?.auteur || "Client")}`, // ✅ CORRIGÉ : Utilise litiges.avatar ou génère un avatar
-          content: litiges?.description || "Bonjour, j'ai un souci avec ma commande.", // ✅ CORRIGÉ : Utilise litiges.description
+          name: litige?.auteur || "Client",
+          avatar: litige?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(litige?.auteur || "Client")}`,
+          content: litige?.description || "Bonjour, j'ai un souci avec ma commande.",
           time: new Date().toISOString(),
         },
       ]);
     }
-  } else {
-    setMessages([
-      {
-        id: 1,
-        sender: "client",
-        name: litiges?.auteur || "Client", // ✅ CORRIGÉ : Utilise litiges.auteur
-        avatar: litiges?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(litiges?.auteur || "Client")}`, // ✅ CORRIGÉ : Utilise litiges.avatar ou génère un avatar
-        content: litiges?.description || "Bonjour, j'ai un souci avec ma commande.", // ✅ CORRIGÉ : Utilise litiges.description
-        time: new Date().toISOString(),
-      },
-    ]);
-  }
-}, [storageKey, litiges]);
+  }, [storageKey, litige]);
 
   useEffect(() => {
     localStorage.setItem(storageKey, JSON.stringify(messages));
@@ -80,6 +84,7 @@ export default function DiscussionLitige({onClose}) {
   const handleTraiter = () => {
     if (window.confirm("Confirmer que ce litige a été traité ?")) {
       setLitigeTraite(true);
+      localStorage.setItem(traiteKey, "true");
       setMessages([
         ...messages,
         {
@@ -111,16 +116,14 @@ export default function DiscussionLitige({onClose}) {
     setEditedContent("");
   };
 
-  // Navigation retour améliorée pour mobile
   const handleRetour = () => {
     navigate("/gestion_des_litiges");
   };
 
-  if (!litiges) return <p className="text-center p-4 text-gray-500">Aucun litige sélectionné.</p>;
+  if (!litige) return <p className="text-center p-4 text-gray-500">Aucun litige sélectionné.</p>;
 
   return (
     <div className="flex flex-col h-full bg-gray-100 min-h-0">
-      {/* ✅ CORRIGÉ : En-tête responsive avec alignement horizontal et tailles adaptées pour mobile */}
       <div className="bg-white shadow p-2 sm:p-4 border-b flex justify-between items-center gap-2 flex-shrink-0">
         <button 
           onClick={handleRetour} 
@@ -128,14 +131,12 @@ export default function DiscussionLitige({onClose}) {
         >
           <span>←</span> Retour
         </button>
-        
         <div className="text-center flex-1">
           <h1 className="font-bold text-xs sm:text-sm md:text-base lg:text-lg leading-tight truncate">
-            Discussion avec {litiges.auteur || litiges.nom || "Utilisateur"}
+            Discussion avec {litige.auteur || litige.nom || "Utilisateur"}
           </h1>
           {litigeTraite && <p className="text-xs sm:text-sm text-green-600 font-semibold truncate">Litige marqué comme traité</p>}
         </div>
-        
         <button
           onClick={handleTraiter}
           disabled={litigeTraite}
@@ -144,14 +145,11 @@ export default function DiscussionLitige({onClose}) {
           Marquer comme traité
         </button>
       </div>
-
-      {/* Messages */}
       <div className="flex-1 p-4 space-y-4 overflow-y-auto min-h-0">
         {messages.map((msg) => (
           <div key={msg.id} className={`flex ${msg.sender === "admin" ? "justify-end" : "justify-start"}`}>
             <div className={`flex items-end gap-2 max-w-md ${msg.sender === "admin" ? "flex-row-reverse" : ""}`}>
               <img src={msg.avatar} alt="avatar" className="w-8 h-8 rounded-full flex-shrink-0" />
-              {/* Messages avec word-wrap pour éviter la coupure */}
               <div className={`p-3 rounded-lg relative text-sm ${msg.sender === "admin" ? "bg-blue-500 text-white" : "bg-gray-200 text-black"} break-words`}>
                 <p className="font-semibold mb-1">{msg.name}</p>
                 {editingId === msg.id ? (
@@ -167,7 +165,6 @@ export default function DiscussionLitige({onClose}) {
                   </>
                 ) : (
                   <>
-                    {/* Affichage des messages avec word-wrap et white-space pre-wrap */}
                     <p className="whitespace-pre-wrap break-words" dangerouslySetInnerHTML={{ __html: msg.content }}></p>
                     <span className="text-xs block mt-1 text-gray-300">{formatTime(msg.time)}</span>
                     {msg.sender === "admin" && !litigeTraite && (
@@ -184,8 +181,6 @@ export default function DiscussionLitige({onClose}) {
         ))}
         <div ref={messageEndRef} />
       </div>
-
-      {/* Champ de réponse avec textarea pour passage à la ligne */}
       <div className="p-4 border-t bg-white flex flex-col sm:flex-row items-start sm:items-end gap-2 flex-shrink-0">
         <textarea
           value={newMessage}
@@ -222,4 +217,3 @@ export default function DiscussionLitige({onClose}) {
     </div>
   );
 }
-
